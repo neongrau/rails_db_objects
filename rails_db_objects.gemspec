@@ -9,15 +9,15 @@ Gem::Specification.new do |s|
   s.version     = RailsDbObjects::VERSION
   s.authors     = [""]
   s.email       = [""]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of RailsDbObjects."
-  s.description = "TODO: Description of RailsDbObjects."
+  s.homepage    = "https://github.com/neongrau/rails_db_objects"
+  s.summary     = "Drops and Creates database objects via rake/hook before and after any rake db:migrate call."
+  s.description = "A tool to manage database objects like views, functions, triggers, stored procedures or assemblies. Inspired by the rails_db_views gem (which you can find at https://github.com/anykeyh/rails_db_views) and re-using a lot of the code from there."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
 
-  s.add_dependency "rails", "~> 4.2.5"
+  s.add_dependency "rails", "> 4.2"
 
   s.add_development_dependency "sqlite3"
 end
