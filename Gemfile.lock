@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_db_objects (0.0.4)
+    rails_db_objects (0.1.0)
       rake-hooks
 
 GEM

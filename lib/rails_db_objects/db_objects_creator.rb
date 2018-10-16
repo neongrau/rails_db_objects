@@ -64,6 +64,24 @@ module RailsDbObjects
 
     private
 
+    def full(name)
+      prefix = @dbschema.blank? ? '' : "#{@dbschema}."
+      "#{prefix}#{wrap_name(name)}"
+    end
+
+    def wrap_name(name)
+      adapter_name = ActiveRecord::Base.connection.adapter_name
+
+      case adapter_name
+      when 'PostgreSQL'
+        "\"#{name}\""
+      when 'MySQL'
+        "`#{name}`"
+      when 'SQLServer'
+        "[#{name}]"
+      end
+    end
+
     def extract_from_comments(content_lines)
       dir_lines = content_lines.select { |x| x.strip =~ /^--/ || x.strip =~ /^#/ }.map(&:strip)
       dir_lines.map { |x| /^--/.match?(x) ? x[2..-1] : x[1..-1] }.select { |x| x =~ /^!/ }
@@ -104,8 +122,8 @@ module RailsDbObjects
         drop_object required_type, required_object, @objects[required_type.upcase][required_object]
       end
 
-      dbschema = (object[:dbschema] || []).clone
-      full_name = [dbschema, "[#{name}]"].flatten.reject(&:blank?).compact.join('.')
+      @dbschema = (object[:dbschema] || []).clone
+      full_name = full(name)
 
       sql = if object[:vanilla]
               object[:sql_content]
@@ -160,8 +178,8 @@ module RailsDbObjects
 
       create_dependencies(object, object_type)
 
-      dbschema = (object[:dbschema] || []).clone
-      full_name = [dbschema, "[#{name}]"].flatten.reject(&:blank?).compact.join('.')
+      @dbschema = (object[:dbschema] || []).clone
+      full_name = full(name)
 
       sql = if object[:vanilla]
               object[:sql_content]
