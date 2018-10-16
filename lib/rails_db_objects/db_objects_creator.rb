@@ -158,7 +158,7 @@ module RailsDbObjects
 
       object[:status] = :inprogress
 
-      create_dependecies(object, object_type)
+      create_dependencies(object, object_type)
 
       dbschema = (object[:dbschema] || []).clone
       full_name = [dbschema, "[#{name}]"].flatten.reject(&:blank?).compact.join('.')
