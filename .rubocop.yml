@@ -1,0 +1,225 @@
+# softened a bit with http://relaxed.ruby.style/rubocop.yml
+
+require:
+  - rubocop-rspec
+
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  # EnabledByDefault: true
+  TargetRubyVersion: 2.5
+  # Cop names are not d§splayed in offense messages by default. Change behavior
+  # by overriding DisplayCopNames, or by giving the -D/--display-cop-names
+  # option.
+  DisplayCopNames: true
+  # Style guide URLs are not displayed in offense messages by default. Change
+  # behavior by overriding DisplayStyleGuide, or by giving the
+  # -S/--display-style-guide option.
+  DisplayStyleGuide: false
+
+# Gems in consecutive lines should be alphabetically sorted
+Bundler/OrderedGems:
+  TreatCommentsAsGroupSeparators: true
+
+# Layout ######################################################################
+# Checks that the closing brace in an array literal is either on the same line
+# as the last array element, or a new line.
+Layout/MultilineArrayBraceLayout:
+  Enabled: true
+  EnforcedStyle: symmetrical
+
+# Checks that the closing brace in a hash literal is either on the same line as
+# the last hash element, or a new line.
+Layout/MultilineHashBraceLayout:
+  Enabled: true
+  EnforcedStyle: symmetrical
+
+# Checks that the closing brace in a method call is either on the same line as
+# the last method argument, or a new line.
+Layout/MultilineMethodCallBraceLayout:
+  Enabled: true
+  EnforcedStyle: symmetrical
+
+# Checks indentation of binary operations that span more than one line.
+Layout/MultilineOperationIndentation:
+  Enabled: true
+  EnforcedStyle: indented
+
+# Checks for padding/surrounding spaces inside string interpolation.
+Layout/SpaceInsideStringInterpolation:
+  EnforcedStyle: no_space
+  Enabled: true
+
+# Naming ######################################################################
+# Check the naming of accessor methods for get_/set_.
+Naming/AccessorMethodName:
+  Enabled: false
+
+Naming/UncommunicativeMethodParamName:
+  MinNameLength: 2
+
+# Use the configured style when naming variables.
+Naming/VariableName:
+  EnforcedStyle: snake_case
+  Enabled: true
+
+# Use the configured style when numbering variables.
+Naming/VariableNumber:
+  Enabled: false
+
+
+# Style #######################################################################
+# Use alias_method instead of alias.
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+  Enabled: true
+
+Style/AsciiComments:
+  Enabled: false
+  StyleGuide: http://relaxed.ruby.style/#styleasciicomments
+
+# This cop checks that comment annotation keywords are written according
+# to guidelines.
+Style/CommentAnnotation:
+  Enabled: false
+
+# Document classes and non-namespace modules.
+Style/Documentation:
+  Enabled: false
+
+# Checks if there is a magic comment to enforce string literals
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/RegexpLiteral:
+  EnforcedStyle: mixed
+  Enabled: false
+
+# Checks for proper usage of fail and raise.
+Style/SignalException:
+  EnforcedStyle: only_raise
+  Enabled: true
+
+# Check for the usage of parentheses around stabby lambda arguments.
+Style/StabbyLambdaParentheses:
+  EnforcedStyle: require_parentheses
+  Enabled: true
+
+# Checks if configured preferred methods are used over non-preferred.
+Style/StringMethods:
+  PreferredMethods:
+    intern: to_sym
+  Enabled: true
+
+# Checks for %q/%Q when single quotes or double quotes would do.
+Style/UnneededPercentQ:
+  Enabled: false
+
+# Metrics #####################################################################
+
+# A calculated magnitude based on number of assignments,
+# branches, and conditions.
+Metrics/AbcSize:
+  Enabled: true
+  Max: 58
+
+# This cop checks if the length of a block exceeds some maximum value.
+Metrics/BlockLength:
+  Enabled: false
+
+# Avoid excessive block nesting.
+Metrics/BlockNesting:
+  Enabled: true
+  Max: 4
+
+# Avoid classes longer than 100 lines of code.
+Metrics/ClassLength:
+  Enabled: false
+
+# A complexity metric that is strongly correlated to the number
+# of test cases needed to validate a method.
+Metrics/CyclomaticComplexity:
+  Enabled: true
+  Max: 11
+
+# Limit lines to 80 characters.
+Metrics/LineLength:
+  Max: 140
+
+# Avoid methods longer than 10 lines of code.
+Metrics/MethodLength:
+  Max: 50
+
+# Avoid modules longer than 100 lines of code.
+Metrics/ModuleLength:
+  Enabled: false
+
+# Avoid parameter lists longer than three or four parameters.
+Metrics/ParameterLists:
+  Enabled: true
+  Max: 8
+
+# A complexity metric geared towards measuring complexity for a human reader.
+Metrics/PerceivedComplexity:
+  Enabled: true
+  Max: 13
+
+# Lint ########################################################################
+
+# This cop looks for use of the same name as outer local variables
+# for block arguments or block local variables.
+Lint/ShadowingOuterLocalVariable:
+  Enabled: false
+
+# Rails #######################################################################
+
+# Enables Rails cops.
+Rails:
+  Enabled: false
+
+# RSpec #######################################################################
+
+# Checks for long example.
+RSpec/ExampleLength:
+  Enabled: false
+  Max: 10
+
+# Do not use should when describing your tests.
+RSpec/ExampleWording:
+  Enabled: false
+  CustomTransform:
+    be: is
+    have: has
+    not: does not
+  IgnoredWords: []
+
+# Checks the file and folder naming of the spec file.
+RSpec/FilePath:
+  Enabled: true
+  CustomTransform:
+    RuboCop: rubocop
+    RSpec: rspec
+
+RSpec/ImplicitExpect:
+  EnforcedStyle: should
+  Enabled: true
+
+# incorrect treats shoulda-matchers
+RSpec/ImplicitSubject:
+  Enabled: false
+
+# Checks for `subject` definitions that come after `let` definitions.
+RSpec/LeadingSubject:
+  Enabled: false
+
+# Checks for explicitly referenced test subjects.
+RSpec/NamedSubject:
+  Enabled: false
+
+# Enforces the usage of the same method on all negative message expectations.
+RSpec/NotToNot:
+  EnforcedStyle: not_to
+  Enabled: true
+
+Style/IfUnlessModifier:
+  Enabled: false
