@@ -128,9 +128,9 @@ module RailsDbObjects
       sql = if object[:vanilla]
               object[:sql_content]
             elsif object[:dropsql].compact.empty?
-              "DROP #{object_type} #{full_name}"
+              "DROP #{object_type} #{full_name};"
             else
-              object[:dropsql].compact.join("\n")
+              object[:dropsql].compact.join(";\n")
             end
 
       begin
