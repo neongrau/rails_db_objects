@@ -57,7 +57,7 @@ You can add/remove the path in the initializers of Rails:
 ```ruby
 Rails.application.config.rails_db_objects[:objects_path] += %w( /db/objects )
 Rails.application.config.rails_db_objects[:objects_ext] = '*.sql'
-Rails.application.config.rails_db_objects[:objects_dbschema] = 'base'
+Rails.application.config.rails_db_objects[:objects_dbschema] = 'base' # can be set to nil if none should be used
 ```
 
 # Licensing
