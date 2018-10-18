@@ -55,11 +55,9 @@ Supported directives are
 You can add/remove the path in the initializers of Rails:
 
 ```ruby
-Rails.configure do |config|
-  config.rails_db_objects.objects_path += %w( /db/objects )
-  config.rails_db_objects.objects_extension = "*.sql"
-  config.rails_db_objects.dbschema = "dbo"
-end
+Rails.application.config.rails_db_objects[:objects_path] += %w( /db/objects )
+Rails.application.config.rails_db_objects[:objects_ext] = '*.sql'
+Rails.application.config.rails_db_objects[:objects_dbschema] = 'base' # can be set to nil if none should be used
 ```
 
 # Licensing
@@ -67,5 +65,3 @@ end
 Based on rails_db_views https://github.com/anykeyh/rails_db_views
 
 MIT. Use it, fork it, have fun!
-
-
