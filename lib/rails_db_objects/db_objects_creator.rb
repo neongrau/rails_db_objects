@@ -103,6 +103,7 @@ module RailsDbObjects
       dir_lines.map { |x| /^--/.match?(x) ? x[2..-1] : x[1..-1] }.select { |x| x =~ /^!/ }
     end
 
+    # rubocop:disable Metrics/AbcSize
     def prepare_directive(file_obj, directive)
       file_obj[:debug] = /^!debug/.match?(directive) unless file_obj[:debug]
       file_obj[:directives] << directive
@@ -122,6 +123,7 @@ module RailsDbObjects
       file_obj[:createsql] << directive.split(' ')[1..-1].join(' ') if /^!createsql /.match?(directive)
       file_obj[:aftercreatesql] << directive.split(' ')[1..-1].join(' ') if /^!aftercreatesql /.match?(directive)
     end
+    # rubocop:enable Metrics/AbcSize
 
     def reset_objects_status!
       @objects.keys.each do |object_type|
@@ -148,6 +150,7 @@ module RailsDbObjects
       object.instance_eval('"' + sql.gsub(/\"/, '\"') + '"')
     end
 
+    # rubocop:disable Metrics/AbcSize
     def drop_object(object)
       return if object[:nodrop]
 
@@ -300,6 +303,7 @@ module RailsDbObjects
 
       object[:status] = :loaded
     end
+    # rubocop:enable Metrics/AbcSize
 
     def create_dependencies(object, object_type)
       object[:requires].each do |requirement|
