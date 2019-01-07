@@ -63,8 +63,8 @@ module RailsDbObjects
     def drop_objects
       reset_objects_status!
       @objects.keys.each do |object_type|
-        @objects[object_type].each do |name, object|
-          drop_object(object_type, name, object)
+        @objects[object_type].each do |_name, object|
+          drop_object(object)
         end
       end
     end
@@ -72,8 +72,8 @@ module RailsDbObjects
     def create_objects
       reset_objects_status!
       @objects.keys.each do |object_type|
-        @objects[object_type].each do |name, object|
-          create_object(object_type, name, object)
+        @objects[object_type].each do |_name, object|
+          create_object(object)
         end
       end
     end
@@ -132,30 +132,36 @@ module RailsDbObjects
     end
 
     def conditional_ruby(condition, object)
-      interpolated_command = object.instance_eval("\"" + condition.gsub(/\"/,'\"') + "\"")
+      interpolated_command = object.instance_eval('"' + condition.gsub(/\"/, '\"') + '"')
       condition = object.instance_eval(interpolated_command)
       if object[:debug]
-        puts "="*80
+        puts '=' * 80
         puts "interpolated_command: #{interpolated_command}"
-        puts "="*80
+        puts '=' * 80
         puts "condition: #{condition.inspect}"
-        puts "="*80
+        puts '=' * 80
       end
       condition ? true : false
     end
 
     def interpolate_sql(sql, object)
-      object.instance_eval("\"" + sql.gsub(/\"/,'\"') + "\"")
+      object.instance_eval('"' + sql.gsub(/\"/, '\"') + '"')
     end
 
-    def drop_object(object_type, name, object)
+    def drop_object(object)
       return if object[:nodrop]
+
       return if object[:status] == :loaded
+
+      object_type = object[:type]
+      name = object[:name]
+      @dbschema = (object[:dbschema] || []).clone
+
       raise "Error: Circular file reference! (#{object_type} #{name})" if object[:status] == :inprogress
 
       full_name = full(name)
 
-      unless object[:dropconditionruby].compact.empty?
+      if object[:dropconditionruby].compact.any?
         condition = conditional_ruby(object[:dropconditionruby].join("\n"), object)
         if condition
           puts "RUBY CONDITION MET FOR #{object_type} #{full_name} #{condition}"
@@ -163,24 +169,22 @@ module RailsDbObjects
           puts "RUBY CONDITION NOT MET FOR #{object_type} #{full_name} #{condition}"
           return
         end
-      else
-        unless object[:condition].compact.empty?
-          condition = !ActiveRecord::Base.connection.select_rows(object[:condition].join("\n")).empty?
-          if condition
-            puts "SQL CONDITION MET FOR #{object_type} #{full_name}"
-          else
-            puts "SQL CONDITION NOT MET FOR #{object_type} #{full_name}"
-            return
-          end
+      elsif object[:condition].compact.any?
+        condition = !ActiveRecord::Base.connection.select_rows(object[:condition].join("\n")).empty?
+        if condition
+          puts "SQL CONDITION MET FOR #{object_type} #{full_name}"
+        else
+          puts "SQL CONDITION NOT MET FOR #{object_type} #{full_name}"
+          return
         end
       end
 
       if object[:debug]
-        puts "="*80
+        puts '=' * 80
         puts "DROP OBJECT #{name} / #{object[:path]}"
-        puts "="*80
-        puts "#{object.to_json}"
-        puts "="*80
+        puts '=' * 80
+        puts object.to_json
+        puts '=' * 80
       end
 
       object[:requires].each do |requirement|
@@ -188,10 +192,8 @@ module RailsDbObjects
         required_object = requires.last
         required_type = requires.first.upcase if requires.length == 2
         required_type ||= object_type
-        drop_object required_type, required_object, @objects[required_type.upcase][required_object]
+        drop_object @objects[required_type.upcase][required_object]
       end
-
-      @dbschema = (object[:dbschema] || []).clone
 
       sql = if object[:dropsql].compact.empty? && !object[:vanilla]
               "DROP #{object_type} #{full_name};"
@@ -221,16 +223,22 @@ module RailsDbObjects
       object[:status] = :loaded
     end
 
-    def create_object(object_type, name, object)
+    def create_object(object)
       return if object[:nocreate]
-      # object already loaded.
+
       return if object[:status] == :loaded
+
+      object_type = object[:type]
+      name = object[:name]
+
       raise "Error: Circular file reference! (#{object_type} #{name})" if object[:status] == :inprogress
+
       object[:status] = :inprogress
+      @dbschema = (object[:dbschema] || []).clone
 
       full_name = full(name)
 
-      unless object[:createconditionruby].compact.empty?
+      if object[:createconditionruby].compact.any?
         condition = conditional_ruby(object[:createconditionruby].join("\n"), object)
         if condition
           puts "RUBY CONDITION MET FOR #{object_type} #{full_name} / #{condition}"
@@ -238,24 +246,22 @@ module RailsDbObjects
           puts "RUBY CONDITION NOT MET FOR #{object_type} #{full_name}"
           return
         end
-      else
-        unless object[:condition].compact.empty?
-          condition = ActiveRecord::Base.connection.select_rows(object[:condition].join("\n")).empty?
-          if condition
-            puts "CONDITION MET FOR #{object_type} #{full_name}"
-          else
-            puts "CONDITION NOT MET FOR #{object_type} #{full_name}"
-            return
-          end
+      elsif object[:condition].compact.any?
+        condition = ActiveRecord::Base.connection.select_rows(object[:condition].join("\n")).empty?
+        if condition
+          puts "CONDITION MET FOR #{object_type} #{full_name}"
+        else
+          puts "CONDITION NOT MET FOR #{object_type} #{full_name}"
+          return
         end
       end
 
       if object[:debug]
-        puts "="*80
+        puts '=' * 80
         puts "CREATE OBJECT #{name} / #{object[:path]}"
-        puts "="*80
-        puts "#{object.to_json}"
-        puts "="*80
+        puts '=' * 80
+        puts object.to_json
+        puts '=' * 80
       end
       # skip empty sql content
       if object[:sql_content].strip.blank?
@@ -264,8 +270,6 @@ module RailsDbObjects
       end
 
       create_dependencies(object, object_type)
-
-      @dbschema = (object[:dbschema] || []).clone
 
       sql = if object[:vanilla]
               interpolate_sql(object[:sql_content], object)
@@ -286,7 +290,7 @@ module RailsDbObjects
         unless object[:silent]
           puts '#' * 80
           puts e.message.to_s
-          # puts "#"*80
+          # puts '#' * 80
           # puts "#{e.backtrace}"
           puts '#' * 80
           puts "WARNING: CREATE #{object_type} #{full_name}... ERROR"
@@ -303,7 +307,7 @@ module RailsDbObjects
         required_object = requires.last
         required_type = requires.first.upcase if requires.length == 2
         required_type ||= object_type
-        create_object required_type, required_object, @objects[required_type.upcase][required_object]
+        create_object(@objects[required_type.upcase][required_object])
       end
     end
   end

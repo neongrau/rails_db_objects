@@ -50,6 +50,9 @@ Layout/SpaceInsideStringInterpolation:
   EnforcedStyle: no_space
   Enabled: true
 
+Layout/EndOfLine:
+  EnforcedStyle: lf
+
 # Naming ######################################################################
 # Check the naming of accessor methods for get_/set_.
 Naming/AccessorMethodName:
@@ -148,7 +151,7 @@ Metrics/LineLength:
 
 # Avoid methods longer than 10 lines of code.
 Metrics/MethodLength:
-  Max: 50
+  Max: 100
 
 # Avoid modules longer than 100 lines of code.
 Metrics/ModuleLength:
