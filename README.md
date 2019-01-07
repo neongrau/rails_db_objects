@@ -29,13 +29,6 @@ The content of the .sql files will be everything except the "CREATE..." or "DROP
 Written as SQL comments with two dashes "--" the gem supports a few directives that can optionally have parameters.
 Supported directives are
 
-All SQL or Ruby-Condition comments allow multiple lines. And also interpolated ruby with `#{Some.ruby(code)}`. If required some information about the current element is accesible via `#{self}`. So for example if you have a more complicated SQL statement you wish to run before the create you can write those this way:
-```sql
---!beforecreatesql SELECT *...
---!beforecreatesql FROM...
---!beforecreatesql WHERE...
-```
-
  - --!debug
     - Prints some useful information about the current object on the command line during processing when `rails db:migrate` triggers drop or create of this element.
  - --!require view/exampleView
@@ -69,6 +62,13 @@ All SQL or Ruby-Condition comments allow multiple lines. And also interpolated r
     - Will execute the code via eval and if the result is Boolean True the create will be executed. Overrides the generic SQL based `--!condition`
  - --!vanilla
     - Will execute just the contents of the .sql file. No DROP or CREATE or name will be appended. Also the folder name the .sql file resides in will not affect the result. Will be executed during DROP and CREATE unless combined with other directives.
+
+All SQL or Ruby-Condition comments allow multiple lines. And also interpolated ruby with `#{Some.ruby(code)}`. If required some information about the current element is accesible via `#{self}`. So for example if you have a more complicated SQL statement you wish to run before the create you can write those this way:
+```sql
+--!beforecreatesql SELECT *...
+--!beforecreatesql FROM...
+--!beforecreatesql WHERE...
+```
 
 ## Configurate paths & extensions
 
