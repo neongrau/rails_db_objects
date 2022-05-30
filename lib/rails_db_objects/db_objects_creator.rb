@@ -206,19 +206,19 @@ module RailsDbObjects
 
       begin
         conditional_ruby(object[:beforedropruby].join("\n"), object) unless object[:beforedropruby].empty?
-        ActiveRecord::Base.connection.execute(object[:beforedropsql].join("\n")) unless object[:beforedropsql].empty?
-        ActiveRecord::Base.connection.execute(sql)
-        ActiveRecord::Base.connection.execute(object[:afterdropsql].join("\n")) unless object[:afterdropsql].empty?
+        ActiveRecord::Base.connection.exec_query(object[:beforedropsql].join("\n")) unless object[:beforedropsql].empty?
+        ActiveRecord::Base.connection.exec_query(sql)
+        ActiveRecord::Base.connection.exec_query(object[:afterdropsql].join("\n")) unless object[:afterdropsql].empty?
         puts "DROP #{object_type} #{full_name}... OK"
         conditional_ruby(object[:afterdropruby].join("\n"), object) unless object[:afterdropruby].empty?
       rescue StandardError => e
         unless object[:debug]
           puts '#' * 80
           puts e.message.to_s
-          # puts "#"*80
-          # puts "#{e.backtrace}"
-          puts '#' * 80
-          puts "WARNING: #{sql}... ERROR"
+          puts "-"*80
+          #puts "#{e.backtrace}"
+          #puts '-' * 80
+          puts "WARNING: >>#{sql}<<... ERROR"
           puts '#' * 80
         end
       end
@@ -284,18 +284,18 @@ module RailsDbObjects
 
       begin
         conditional_ruby(object[:beforecreateruby].join("\n"), object) unless object[:beforecreateruby].empty?
-        ActiveRecord::Base.connection.execute(object[:beforecreatesql].join("\n")) unless object[:beforecreatesql].empty?
-        ActiveRecord::Base.connection.execute(sql.to_s)
-        ActiveRecord::Base.connection.execute(object[:aftercreatesql].join("\n")) unless object[:aftercreatesql].empty?
+        ActiveRecord::Base.connection.exec_query(object[:beforecreatesql].join("\n")) unless object[:beforecreatesql].empty?
+        ActiveRecord::Base.connection.exec_query(sql.to_s)
+        ActiveRecord::Base.connection.exec_query(object[:aftercreatesql].join("\n")) unless object[:aftercreatesql].empty?
         conditional_ruby(object[:aftercreateruby].join("\n"), object) unless object[:aftercreateruby].empty?
         puts "CREATE #{object_type} #{full_name}... OK"
       rescue StandardError => e
         unless object[:silent]
           puts '#' * 80
           puts e.message.to_s
-          # puts '#' * 80
-          # puts "#{e.backtrace}"
-          puts '#' * 80
+          puts '-' * 80
+          puts sql.to_s
+          puts '-' * 80
           puts "WARNING: CREATE #{object_type} #{full_name}... ERROR"
           puts '#' * 80
         end
