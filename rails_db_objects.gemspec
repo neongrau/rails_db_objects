@@ -19,8 +19,8 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.rdoc']
   s.test_files = Dir['test/**/*']
 
-  s.add_dependency 'rake-hooks'
+  s.add_dependency 'rake-hooks', '~>1.2.3'
 
-  s.add_development_dependency 'rubocop'
-  s.add_development_dependency 'rubocop-rspec'
+  s.add_development_dependency 'rubocop', '~>1.30.1'
+  s.add_development_dependency 'rubocop-rspec', '~>2.11.1'
 end
